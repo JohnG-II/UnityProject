@@ -18,6 +18,25 @@ terraform destory
 
 # Jenkins
 Jenkins will enable us to achieve Continuos Integration and Continuous Deployment. Our Jenkins pipeline-script  will ensure once the application is developed or modified it is automatically build using maven, tested using selenium, validated using SonarQube. The build artifacts will be uploaded to Nexus Private aritifact repository. 
+
+## ===Install Java, Jenkins, Docker in Ubuntu==============
+
+sudo apt update -y
+sudo apt install openjdk-8-jdk -y
+wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -
+sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+sudo apt-get update -y
+sudo apt-get install jenkins -y
+sudo systemctl status jenkins
+sudo curl -fsSL get.docker.com | /bin/bash
+#Add jenkins user to docker group
+sudo usermod -aG docker jenkins
+#Restart jenkins to reflect docker permisions
+sudo systemctl restart jenkins
+#Use below commands if you want to switch to jenkins user.
+sudo -i -u jenkins
+sudo su -s /bin/bash jenkins
+
 # GitHub
 The scripts used for this project can be clone from https://github.com/WinifredZenabuin/UnityProject.
 I also confihured github-webhook so that ounce the source code is modified jenkins will srtigger a build.  

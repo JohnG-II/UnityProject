@@ -1,4 +1,14 @@
 #=== Deploy Springboot App With Service type as LB & Mongo POD with Dynamcic Volumes======
+# Config Map
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: springapp-configmap
+data:
+  # Configuration values can be set as key-value properties
+  username: springapp
+  password: mongodb@123
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,12 +30,19 @@ spec:
         ports:
         - containerPort: 8080
         env:
-        - name: MONGO_DB_USERNAME
-          value: devdb
-        - name: MONGO_DB_PASSWORD
-          value: devdb@123
         - name: MONGO_DB_HOSTNAME
-          value: mongo 
+          value: mongo
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: springapp-configmap
+              key: username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: springapp-configmap
+              key: password
+
 ---
 apiVersion: v1
 kind: Service
@@ -74,10 +91,17 @@ spec:
          ports:
          - containerPort: 27017
          env:
-         - name: MONGO_INITDB_ROOT_USERNAME
-           value: devdb
-         - name: MONGO_INITDB_ROOT_PASSWORD
-           value: devdb@123
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: springapp-configmap
+              key: username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: springapp-configmap
+              key: password
+
          volumeMounts:
          - name: pvc
            mountPath: /data/db   
